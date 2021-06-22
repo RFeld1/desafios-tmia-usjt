@@ -75,6 +75,7 @@ Após criado, salvei o arquivo.csv
 
 Para criar um conjunto de dados no Azure ML, utilizei esse tutorial, como exemplo: https://docs.microsoft.com/pt-br/learn/modules/use-automated-machine-learning/data
 Depois de criado, segue imagem da Visualização dos "dados brutos". Repare que contém alguns registros faltantes.
+
 ![](https://github.com/RFeld1/desafios-tmia-usjt/blob/main/Images/4-dataset-view.png)
 
 No painel à esquerda, do Estudio, expanda a seção Datasets e arraste o módulo "Micro Dados Enem 19" para a tela.
@@ -121,6 +122,7 @@ Para testar o modelo treinado, precisamos usá-lo para pontuar o conjunto de dad
 #### 8.2. Resultados do treinamento
 Após feito e executado o experimento do pipeline de treinamento, seguem os resultados parciais:
 ![](https://github.com/RFeld1/desafios-tmia-usjt/blob/main/Images/8-resultado-score-model-treino.png)
+
 Observe que ao lado da coluna NU_NOTA_CN (que contém os valores verdadeiros), há uma nova coluna denominada **Rótulos pontuados**, que contém os valores de rótulo previstos.
 Pode-se ver também, que o resultado não foi bom...rs
 
@@ -132,14 +134,72 @@ O modelo está prevendo valores para o rótulo preço, mas o quão confiáveis s
 Confira como fica o pipeline de treino executado:
 ![](https://github.com/RFeld1/desafios-tmia-usjt/blob/main/Images/7-pipeline-treinamento.png)
 
-#### 9.2. Avaliação do modelo
+#### 9.1. Avaliação do modelo
 Selecione o módulo "Avaliar Modelo" e, no painel de configurações, na guia Saídas + logs, em Saídas de dados na seção Resultados da avaliação, use o ícone **Visualizar** para ver os resultados.
 ![](https://github.com/RFeld1/desafios-tmia-usjt/blob/main/Images/9-avaliacao-do-modelo-pipeline-treino.png)
-Os resultados incluem as métricas:
 
-- MAE (erro médio absoluto): a diferença média entre os valores previstos e os valores reais. Quanto menor esse valor, melhor a qualidade da previsão do modelo;
-- REQM (raiz do erro quadrático médio): A raiz quadrada da diferença quadrática média entre os valores previstos e verdadeiros. Quando comparado ao MAE (acima), uma diferença maior indica maior variância nos erros individuais;
-- RSE (erro ao quadrado relativo): uma métrica relativa entre 0 e 1 com base no quadrado das diferenças entre os valores previstos e os reais. Quanto mais próximo de 0 essa métrica for, melhor será o desempenho do modelo;
-- RAE (erro absoluto relativo): uma métrica relativa entre 0 e 1 com base nas diferenças absolutas entre os valores previstos e os reais. Quanto mais próximo de 0 essa métrica for, melhor será o desempenho do modelo;
-Coeficiente de determinação (R 2): essa métrica é mais comumente conhecida como R-quadrado e resume a quantidade de variância entre os valores previstos e verdadeiros que é explicada pelo modelo. Quanto mais próximo de 1 for esse valor, melhor será o desempenho do modelo.
+Métricas:
+<center><ul>
+<li> MAE (erro médio absoluto): a diferença média entre os valores previstos e os valores reais. Quanto menor esse valor, melhor a qualidade da previsão do modelo;</li>
+<li> REQM (raiz do erro quadrático médio): A raiz quadrada da diferença quadrática média entre os valores previstos e verdadeiros. Quando comparado ao MAE (acima), uma diferença maior indica maior variância nos erros individuais;</li>
+<li> RSE (erro ao quadrado relativo): uma métrica relativa entre 0 e 1 com base no quadrado das diferenças entre os valores previstos e os reais. Quanto mais próximo de 0 essa métrica for, melhor será o desempenho do modelo;</li>
+<li> RAE (erro absoluto relativo): uma métrica relativa entre 0 e 1 com base nas diferenças absolutas entre os valores previstos e os reais. Quanto mais próximo de 0 essa métrica for, melhor será o desempenho do modelo;</li>
+<li> Coeficiente de determinação (R 2): essa métrica é mais comumente conhecida como R-quadrado e resume a quantidade de variância entre os valores previstos e verdadeiros que é explicada pelo modelo. Quanto mais próximo de 1 for esse valor, melhor será o desempenho do modelo.</li>
+</ul></center>
+
+### 10. PASSO 6: Criar e executar um pipeline de inferência
+
+#### 10.1. Criar um pipeline de inferência
+
+1. Na lista suspensa "Criar um pipeline de inferência", clique em **Pipeline de inferência em tempo real**. Depois de alguns segundos, uma nova versão do seu pipeline de treino, com posfixo " – inferência em tempo real" será aberta. Renomeie o novo pipeline para **Prever Notas CN Enem 19**.
+2. Substitua o conjunto de dados *Micro Dados Enem 19* com um módulo **Inserir Dados Manualmente**.
+3. Modifique o módulo "Selecionar colunas no conjunto de dados" para remover referências à coluna NU_NOTA_CN.
+4. Remova o módulo "Avaliar Modelo", que não é útil ao prever dados novos.
+5. Insira um módulo **Executar script Python** antes da "saída do serviço Web" para retornar apenas o rótulo previsto e faça a ligação da saída do módulo "Pontuar Modelo" na entrada (à esquerda) deste novo módulo.
+
+Veja como fica o Pipeline de Inferência executado:
+![](https://github.com/RFeld1/desafios-tmia-usjt/blob/main/Images/10-pipeline-inferencia.png)
+
+6. No módulo "Inserir Dados Manualmente", altere os parâmetros do csv para:
+
+```
+NU_INSCRICAO,NU_NOTA_MT
+1,489
+2,587
+3,989
+4,570
+```
+Remova a coluna NU_NOTA_CN, pois você quer prever as notas de CN a partir de MT.
+- Adicionei 5 notas, como exemplo de entrada de dados.
+
+7. Ao clicar no módulo **Executar script Python**, substitua o script Python padrão, pelo código:
+```python
+import pandas as pd
+
+def azureml_main(dataframe1 = None, dataframe2 = None):
+
+    scored_results = dataframe1[['Scored Labels']]
+    scored_results.rename(columns={'Scored Labels':'predita_NU_NOTA_CN'},
+                        inplace=True)
+    return scored_results
+```
+
+#### 10.2. Resultados inferência
+Após enviar o pipeline como um novo experimento no cluetes de computação (pode demorar um pouco) obtive os seguintes resultados:
+![](https://github.com/RFeld1/desafios-tmia-usjt/blob/main/Images/11-resultados-inferencias.png)
+
+-Para uma nota de Matemática no valor de 489, foi prevista a nota 462.37
+-Pode-se observar que o modelo não conseguiu prever a nota correta.
+
+-Outros resultados, no módulo de Pontuação:
+![](https://github.com/RFeld1/desafios-tmia-usjt/blob/main/Images/12-resultados-score-model-inferencia.png)
+
+### 11. Conclusão
+Concluo que o modelo precisa ser melhor modelado e testado, provavelmente experimentando outros algoritmos de regressão diferentes, para se tentar alcançar melhores resultados.
+Agradeço a todos os Professores envolvidos, em especial aos da minha turma (Prof. José Carmino e Profª Edyene Oliveira), ao FLavio da Ânima e a @Microsoft pela oportunidade de aprendizagem de A.I através desse curso.
+
+
+
+
+
 
