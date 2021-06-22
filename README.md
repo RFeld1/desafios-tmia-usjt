@@ -29,7 +29,7 @@ Link para download do dataset completo: https://download.inep.gov.br/microdados/
 ### 5. PASSO 1: Criar um Workspace do Azure Machine Learning
 - Nome do workspace: desafios-ml-sj
 
-![](https://github.com/RFeld1/desafios-tmia-usjt/blob/main/images/1-grupo-de-recrusos.png)
+![](https://github.com/RFeld1/desafios-tmia-usjt/blob/main/Images/1-grupo-de-recrusos.png)
 
 ### 6. PASSO 4: Criar recursos de computação
 Para treinar e implantar modelos usando o designer do Azure Machine Learning, é necessário usar a computação para executar o processo de treinamento e testar o modelo treinado após a implantação.
