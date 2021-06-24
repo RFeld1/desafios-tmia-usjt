@@ -1,4 +1,5 @@
 # Desafio Final - Trilha Engenheiro IA Microsoft
+
 Repo contendo relatório para os problemas apresentados no Desafio Final - Trilha Engenheiro IA Microsoft, que envolvem Machine Learning e Inteligência Artificial aplicados ao contexto da educação. O Desafio Final, faz parte da iniciativa de aprendizagem de IA, ofertada pelo grupo Ãnima em parceria com a Microsoft, para os estudantes das universidades do grupo, no primeiro semestre de 2021.
 
 Utilizei o Microsoft Learn p/ apoio ao desenvolvimento deste estudo.
@@ -66,14 +67,14 @@ Foi criado um cluster de computação com as seguntes configurações:
 Um pipeline será usado para treinar um modelo de machine learning.
 
 #### 7.2. Adicionar e explorar um conjunto de dados
-Devido a quantidade de dados que o Dataset original contém, cerca de 2.5Gb de dados, sendo 10k linhas e 136 colunas, ao executar meu pipeline, obtive falha, pela quantidade de dados.
+Devido a quantidade de dados que o Dataset original contém, cerca de 2.5Gb de dados, sendo 10k linhas e 136 colunas, ao executar meu pipeline, obtive falha recorrente, devido a quantidade de dados. Talvez, seria necessário maior provisionamento de recursos de máquina.
 Decidi criar um novo Dataset, utilizando apenas 3 colunas, limitando assim as variáveis, sendo: 
-NU_INSCRICAO - Nº de ordem, para contagem das provas.
-NU_NOTA_CN - Notas das provas de Ciências Naturais
-NU_NOTA_MT - Notas das provas de Matemática
+-NU_INSCRICAO - Nº de ordem, para contagem das provas.
+-NU_NOTA_CN - Notas das provas de Ciências Naturais
+-NU_NOTA_MT - Notas das provas de Matemática
 Após criado, salvei o arquivo.csv
 
-Para criar um conjunto de dados no Azure ML, utilizei esse tutorial, como exemplo: https://docs.microsoft.com/pt-br/learn/modules/use-automated-machine-learning/data
+Para criar um conjunto de dados no Azure ML, utilizei este tutorial, como exemplo: https://docs.microsoft.com/pt-br/learn/modules/use-automated-machine-learning/data
 Depois de criado, segue imagem da Visualização dos "dados brutos". Repare que contém alguns registros faltantes.
 
 ![](https://github.com/RFeld1/desafios-tmia-usjt/blob/main/Images/4-dataset-view.png)
@@ -83,14 +84,14 @@ No painel à esquerda, do Estudio, expanda a seção Datasets e arraste o módul
 #### 7.3. Adicionar transformações de dados
 Normalmente, você aplica transformações de dados para preparar os dados para modelagem.
 
-1 - No painel à esquerda, expanda a seção "Transformação de Dados" e arraste um módulo **Selecionar Colunas no Conjunto de Dados** para a tela, abaixo do módulo "Micro Dados Enem 19" e conecte a saída deste último na entrada do módulo de seleção de colunas.
-2 - Neste módulo de seleção, edite as colunas para selecionar as colunas com nomes NU_NOTA_CN e NU_NOTA_MT.
+- No painel à esquerda, expanda a seção "Transformação de Dados" e arraste um módulo **Selecionar Colunas no Conjunto de Dados** para a tela, abaixo do módulo "Micro Dados Enem 19" e conecte a saída deste último na entrada do módulo de seleção de colunas.
+- Neste módulo de seleção, edite as colunas para selecionar as colunas com nomes NU_NOTA_CN e NU_NOTA_MT.
 ![](https://github.com/RFeld1/desafios-tmia-usjt/blob/main/Images/5-select-cols.png)
 
 Agora é a hora de limpar os dados, pois temos registros faltantes, conforte citado acima.
-1 - Arraste um módulo **Limpar Dados Ausentes** da seção "Transformações de Dados" e coloque-o no módulo "Selecionar Colunas no Conjunto de Dados".
-2 - Selecione este módulo e edite as colunas. 
-3 - Na janela de colunas, selecione colunas com regras pelos nomes, NU_NOTA_MT.
+- Arraste um módulo **Limpar Dados Ausentes** da seção "Transformações de Dados" e coloque-o no módulo "Selecionar Colunas no Conjunto de Dados".
+- Selecione este módulo e edite as colunas. 
+- Na janela de colunas, selecione colunas com regras pelos nomes, NU_NOTA_MT.
 
 Defina o painel de configurações, conforme a imagem:
 ![](https://github.com/RFeld1/desafios-tmia-usjt/blob/main/Images/6-clean-data.png)
@@ -102,22 +103,24 @@ Após a transformação dos dados, vamos treinar um modelo de machine learning.
 
 #### 8.1. Adicionar módulos de treinamento
 
-1 - No painel à esquerda, na seção "Transformações de Dados", arraste um módulo **Dividir Dados** na tela, p/ baixo do módulo "Limpar Dados Ausentes". Em seguida, conecte a saída que contém *Conjunto de dados transformados* (à esquerda) do módulo "Limpar Dados Ausentes" para a entrada do módulo "Dividir dados".
-2 - Selecione o módulo Dividir dados e defina as configurações dele da seguinte maneira:
+1. No painel à esquerda, na seção "Transformações de Dados", arraste um módulo **Dividir Dados** na tela, p/ baixo do módulo "Limpar Dados Ausentes". Em seguida, conecte a saída que contém *Conjunto de dados transformados* (à esquerda) do módulo "Limpar Dados Ausentes" para a entrada do módulo "Dividir dados".
+2. Selecione o módulo Dividir dados e defina as configurações dele da seguinte maneira:
 
 - Modo de divisão: dividir linhas
 - Fração das linhas no primeiro conjunto de dados de saída: 0,7
 - Semente aleatória: 123
 - Divisão estratificada: Falso
 
-3 - Expanda a seção "Treinamento de Modelo" no painel à esquerda e arraste um módulo **Treinar Modelo** na tela, p/ baixo do módulo "Dividir Dados". Em seguida, conecte a saída (à esquerda) deste último na entrada (à direita) do módulo de treino.
-4 - O modelo que estamos treinando preverá o valor de NU_NOTA_CN. Portanto, selecione o módulo "Treinar Modelo" e modifique as configurações dele para definir a Label Column como NU_NOTA_CN. (variável alvo)
+3. Expanda a seção "Treinamento de Modelo" no painel à esquerda e arraste um módulo **Treinar Modelo** na tela, p/ baixo do módulo "Dividir Dados". Em seguida, conecte a saída (à esquerda) deste último na entrada (à direita) do módulo de treino.
+4. O modelo que estamos treinando preverá o valor de NU_NOTA_CN. Portanto, selecione o módulo "Treinar Modelo" e modifique as configurações dele para definir a Label Column como NU_NOTA_CN. (variável alvo)
 
 Como o rótulo NU_NOTA_CN que o modelo irá prever é um valor numérico, então precisamos treinar o modelo usando um algoritmo de *regressão*.
-5 - Expanda a seção "Algoritmos de Machine Learning" e, sob "Regressão", arraste um módulo **Regressão Linear** para a tela, à esquerda do módulo "Dividir Dados" e acima do módulo "Treinar Modelo".  Em seguida, conecte a saída deste novo módulo à entrada do *Modelo não treinado* (à esquerda) do módulo "Treinar Modelo".
+
+5. Expanda a seção "Algoritmos de Machine Learning" e, sob "Regressão", arraste um módulo **Regressão Linear** para a tela, à esquerda do módulo "Dividir Dados" e acima do módulo "Treinar Modelo".  Em seguida, conecte a saída deste novo módulo à entrada do *Modelo não treinado* (à esquerda) do módulo "Treinar Modelo".
 
 Para testar o modelo treinado, precisamos usá-lo para pontuar o conjunto de dados de validação que retivemos quando dividimos os dados originais.
-6 - Expanda a seção "Pontuação e Avaliação de Modelo" e arraste um módulo **Pontuar Modelo** para a tela, abaixo do módulo "Treinar Modelo". Em seguida, conecte a saída deste, à entrada *Modelo treinado* (à esquerda) do módulo "Pontuar Modelo" e arraste a saída (à direita) do módulo "Dividir dados" para a entrada Conjunto de dados (à direita) do módulo "Pontuar Modelo".
+
+6. Expanda a seção "Pontuação e Avaliação de Modelo" e arraste um módulo **Pontuar Modelo** para a tela, abaixo do módulo "Treinar Modelo". Em seguida, conecte a saída deste, à entrada *Modelo treinado* (à esquerda) do módulo "Pontuar Modelo" e arraste a saída (à direita) do módulo "Dividir dados" para a entrada Conjunto de dados (à direita) do módulo "Pontuar Modelo".
 
 #### 8.2. Resultados do treinamento
 Após feito e executado o experimento do pipeline de treinamento, seguem os resultados parciais:
@@ -127,9 +130,9 @@ Observe que ao lado da coluna NU_NOTA_CN (que contém os valores verdadeiros), h
 Pode-se ver também, que o resultado não foi bom...rs
 
 ### 9. PASSO 5: Avaliar um modelo de regressão
-O modelo está prevendo valores para o rótulo preço, mas o quão confiáveis são as previsões dele?
+O modelo está prevendo valores para o rótulo NU_NOTA_CN, mas o quão confiáveis são as previsões dele?
 
-1- Na seção "Pontuação e avaliação do modelo", arraste um módulo **Avaliar Modelo** para a tela sob o módulo "Pontuar Modelo" e conecte a saída deste ultimo à entrada do *Conjunto de dados pontuado* (à esquerda) do módulo "Avaliar Modelo".
+- Na seção "Pontuação e avaliação do modelo", arraste um módulo **Avaliar Modelo** para a tela sob o módulo "Pontuar Modelo" e conecte a saída deste ultimo à entrada do *Conjunto de dados pontuado* (à esquerda) do módulo "Avaliar Modelo".
 
 Confira como fica o pipeline de treino executado:
 ![](https://github.com/RFeld1/desafios-tmia-usjt/blob/main/Images/7-pipeline-treinamento.png)
@@ -151,7 +154,7 @@ Métricas:
 
 #### 10.1. Criar um pipeline de inferência
 
-1. Na lista suspensa "Criar um pipeline de inferência", clique em **Pipeline de inferência em tempo real**. Depois de alguns segundos, uma nova versão do seu pipeline de treino, com posfixo " – inferência em tempo real" será aberta. Renomeie o novo pipeline para **Prever Notas CN Enem 19**.
+1. Na lista suspensa "Criar um pipeline de inferência", clique em **Pipeline de inferência em tempo real**. Depois de alguns segundos, uma nova versão do seu pipeline de treino, com sufixo " – inferência em tempo real" será aberta. Renomeie o novo pipeline para **Prever Notas CN Enem 19**.
 2. Substitua o conjunto de dados *Micro Dados Enem 19* com um módulo **Inserir Dados Manualmente**.
 3. Modifique o módulo "Selecionar colunas no conjunto de dados" para remover referências à coluna NU_NOTA_CN.
 4. Remova o módulo "Avaliar Modelo", que não é útil ao prever dados novos.
@@ -185,7 +188,7 @@ def azureml_main(dataframe1 = None, dataframe2 = None):
 ```
 
 #### 10.2. Resultados inferência
-Após enviar o pipeline como um novo experimento no cluetes de computação (pode demorar um pouco) obtive os seguintes resultados:
+Após enviar o pipeline como um novo experimento no cluster de computação (pode demorar um pouco) obtive os seguintes resultados:
 ![](https://github.com/RFeld1/desafios-tmia-usjt/blob/main/Images/11-resultados-inferencias.png)
 
 -Para uma nota de Matemática no valor de 489, foi prevista a nota 462.37
@@ -195,8 +198,10 @@ Após enviar o pipeline como um novo experimento no cluetes de computação (pod
 ![](https://github.com/RFeld1/desafios-tmia-usjt/blob/main/Images/12-resultados-score-model-inferencia.png)
 
 ### 11. Conclusão
-Concluo que o modelo precisa ser melhor modelado e testado, provavelmente experimentando outros algoritmos de regressão diferentes, para se tentar alcançar melhores resultados.
-Agradeço a todos os Professores envolvidos, em especial aos da minha turma (Prof. José Carmino e Profª Edyene Oliveira), ao FLavio da Ânima e a @Microsoft pela oportunidade de aprendizagem de A.I através desse curso.
+Concluo que **o modelo precisa ser melhor modelado e testado**, provavelmente experimentando outros algoritmos de regressão diferentes, para se tentar alcançar melhores resultados.
+Caso testado outros algoritmos não haja relevante alteração nas métricas de avaliação do modelo, então _**seria possivel concluir que não há correlação entre as notas das provas objetivas.**_
+
+Agradeço a todos os Professores envolvidos, em especial aos da minha turma (Prof. José Carmino e Profª Edyene Oliveira), ao FLavio da Ânima e a @Microsoft pela oportunidade de aprendizagem de A.I através desse curso! :stuck_out_tongue:	
 
 
 
